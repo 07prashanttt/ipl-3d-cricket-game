@@ -1,3 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>IPL Cricket Universe</title>
+<style>
+:root{--gold:#ffd166;--green:#18a66a;--dark:#071321;--panel:#10243a;--muted:#a9bfd1}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#183a58,#06101d 65%);color:#fff;font-family:system-ui,Arial,sans-serif}
+header{padding:15px 14px;text-align:center;background:#06101ddd;border-bottom:1px solid #31516b;position:sticky;top:0;z-index:5}
+header h1{margin:0;color:var(--gold);font-size:clamp(22px,6vw,32px);letter-spacing:1px}header small{color:#b9ccda}
+nav{display:flex;gap:7px;padding:10px;overflow:auto;background:#081827;position:sticky;top:68px;z-index:4}
+nav button{white-space:nowrap;flex:1;min-width:max-content}
+button{border:0;border-radius:12px;padding:12px 15px;font-weight:800;background:linear-gradient(135deg,#ffd166,#ff9f1c);color:#17202a;cursor:pointer}
+button.secondary{background:#24435c;color:#fff;border:1px solid #41637c}button.green{background:linear-gradient(135deg,#2de39a,#0b9b69);color:#032719}
+button:disabled{opacity:.4}
+main{max-width:1050px;margin:auto;padding:12px}.screen{display:none}.screen.active{display:block}
+.panel{background:linear-gradient(145deg,#132c44,#0c1c2d);border:1px solid #2b4b64;border-radius:17px;padding:15px;margin:10px 0;box-shadow:0 10px 30px #0005}
+h2{color:var(--gold);margin:5px 0 12px}h3{margin:5px 0;color:#fff}.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
+.team{padding:13px;border-radius:14px;border:1px solid #49647a;background:#17324a;text-align:center;cursor:pointer}
+.team.selected{outline:3px solid var(--gold);background:#254866}.team b{display:block;font-size:17px}.team span{font-size:12px;color:#c2d5e4}
+.statrow{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pill{background:#1d3c55;padding:8px 11px;border-radius:30px;font-weight:700;font-size:13px}
+.player{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px;border-bottom:1px solid #345066}
+.player:last-child{border:0}.player small{display:block;color:#aac0d1}.price{color:var(--gold);font-weight:900;white-space:nowrap}
+#ground{width:100%;height:290px;display:block;border-radius:15px;border:2px solid #54728a;background:#102b39}
+.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.controls button{padding:15px 5px;font-size:14px}
+.score{font-size:clamp(27px,7vw,42px);font-weight:950;color:var(--gold);text-align:center}
+.center{text-align:center}.hidden{display:none!important}
+.notice{padding:10px;background:#0a1725;border-radius:10px;color:#c6d9e8;margin-top:10px}
+select{width:100%;padding:12px;border-radius:10px;background:#17324a;color:white;border:1px solid #53718a;margin:6px 0}
+footer{text-align:center;color:#829bad;padding:20px;font-size:12px}
+@media(min-width:700px){#ground{height:390px}.controls{max-width:650px;margin:12px auto}.score{text-align:left}}
+</style>
+</head>
+<body>
+<header><h1>🏏 IPL CRICKET UNIVERSE</h1><small>Build your squad • Win the auction • Play the match</small></header>
+<nav>
+<button class="secondary" onclick="show('home')">🏠 Home</button>
+<button class="secondary" onclick="show('auction')">🔨 Auction</button>
+<button class="secondary" onclick="show('matchSetup')">🏟️ Play Match</button>
+<button class="secondary" onclick="show('squad')">👥 My Squad</button>
+</nav>
+<main>
+<section id="home" class="screen active">
+ <div class="panel center"><h2>WELCOME TO IPL CRICKET</h2><p>अपनी टीम चुनो, नीलामी में खिलाड़ी खरीदो और मैदान पर मैच खेलो।</p><div style="font-size:58px">🏟️ 🏏 🏆</div><button class="green" onclick="show('teamSelect')">START YOUR IPL JOURNEY</button></div>
+ <div class="grid">
+  <div class="panel"><h3>🔨 Mega Auction</h3><p class="muted">बजट में खिलाड़ी खरीदकर अपनी टीम बनाओ।</p><button onclick="show('auction')">Open Auction</button></div>
+  <div class="panel"><h3>🏏 Quick Match</h3><p class="muted">टाइमिंग से शॉट खेलो और रन बनाओ।</p><button onclick="show('matchSetup')">Play Now</button></div>
+  <div class="panel"><h3>👥 Team Squad</h3><p class="muted">अपने खरीदे हुए खिलाड़ी देखो।</p><button onclick="show('squad')">View Squad</button></div>
+ </div>
+ <p class="muted center">यह शुरुआती playable browser prototype है।</p>
+</section>
+
+<section id="teamSelect" class="screen">
+ <div class="panel"><h2>अपनी फ्रेंचाइज़ी चुनो</h2><p class="muted">तुम्हारी चुनी टीम की नीलामी और स्क्वाड इसी सेव होंगे।</p><div id="teams" class="grid"></div></div>
+</section>
+
+<section id="auction" class="screen">
+ <div class="panel"><h2>🔨 IPL Mega Auction</h2><div class="statrow"><span class="pill" id="auctionTeam">टीम: चुनें</span><span class="pill" id="purse">बजट: ₹100 Cr</span><span class="pill" id="bought">खिलाड़ी: 0</span></div>
+ <p class="muted">हर खिलाड़ी पर BID दबाओ। कीमत बढ़ती जाएगी। बजट खत्म होने से पहले अपनी टीम बनाओ।</p>
+ <div id="auctionPlayer" class="panel"></div>
+ <div class="controls"><button class="secondary" onclick="skipPlayer()">PASS</button><button class="green" onclick="bid()">🔨 BID</button><button onclick="nextPlayer()">NEXT PLAYER</button></div>
+ <div id="auctionMsg" class="notice">नीलामी शुरू करने के लिए पहले टीम चुनें।</div>
+ </div>
+</section>
+
+<section id="squad" class="screen"><div class="panel"><h2>👥 मेरी टीम</h2><div id="squadInfo"></div><div id="squadList"></div></div></section>
+
+<section id="matchSetup" class="screen">
+ <div class="panel"><h2>🏟️ Match Setup</h2><p class="muted">अपनी टीम और मैच का ओवर चुनो।</p>
+ <label>तुम्हारी टीम</label><select id="myTeam"></select><label>विरोधी टीम</label><select id="oppTeam"></select>
+ <label>मैच के ओवर</label><select id="overs"><option value="2">2 ओवर (Quick)</option><option value="5" selected>5 ओवर</option><option value="10">10 ओवर</option></select>
+ <button class="green" onclick="startMatch()">TOSS & START MATCH</button></div>
+</section>
+
+<section id="match" class="screen">
+ <div class="panel"><div class="statrow"><span class="pill" id="batTeam">TEAM</span><span class="pill" id="overText">0.0 overs</span><span class="pill" id="targetText">Target: —</span></div>
+ <div class="score" id="score">0/0</div><div class="center" id="commentary">मैच शुरू होने वाला है!</div>
+ <canvas id="ground" width="900" height="500"></canvas>
+ <div class="controls"><button onclick="chooseShot('DEFENCE')">🛡️ DEFENCE</button><button class="green" id="hitBtn" onclick="hit()">🏏 HIT SHOT</button><button onclick="chooseShot('LOFT')">🚀 LOFT</button></div>
+ <div class="notice" id="timing">गेंदबाज गेंद डाल रहा है। गेंद हिटिंग ज़ोन में आए तो HIT दबाओ!</div>
+ <div class="center" style="margin-top:12px"><button class="secondary" onclick="show('home')">Exit Match</button></div>
+ </div>
+</section>
+<section id="result" class="screen"><div class="panel center"><h2>🏆 MATCH RESULT</h2><div class="score" id="resultScore"></div><p id="resultText"></p><button class="green" onclick="show('matchSetup')">PLAY AGAIN</button> <button class="secondary" onclick="show('home')">HOME</button></div></section>
+</main>
+<footer>IPL Cricket Universe • Fan-made prototype • Not affiliated with the official IPL or WCC2</footer>
+<script>
+const teams=[
+{name:"Mumbai",short:"MI",color:"#1686d9"},{name:"Chennai",short:"CSK",color:"#f4c542"},{name:"Bengaluru",short:"RCB",color:"#d93443"},{name:"Kolkata",short:"KKR",color:"#7653b5"},{name:"Hyderabad",short:"SRH",color:"#ed762c"},{name:"Rajasthan",short:"RR",color:"#e66ba8"},{name:"Delhi",short:"DC",color:"#4d8ee8"},{name:"Punjab",short:"PBKS",color:"#d84b59"},{name:"Lucknow",short:"LSG",color:"#39b9bd"},{name:"Gujarat",short:"GT",color:"#4b647d"}
+];
+const players=[
+["Aarav Storm","Batter",9.5,91],["Rohan Blaze","All-rounder",12,94],["Dev Thunder","Fast Bowler",8,88],["Kabir King","Wicketkeeper",7.5,86],["Vihaan Spin","Spinner",6,84],["Arjun Power","Batter",10,92],["Ishaan Swing","Fast Bowler",7,87],["Reyansh Pro","All-rounder",11,90],["Aditya Wall","Batter",5,82],["Yuvaan Yorker","Fast Bowler",6.5,85],["Manav Gloves","Wicketkeeper",4,79],["Shaurya Six","Batter",8,89],["Krish Spin","Spinner",5.5,83],["Rudra Ace","All-rounder",9,88],["Parth Pace","Fast Bowler",4.5,80],["Neil Cover","Batter",3.5,77],["Ayaan Finisher","Batter",7,86],["Dhruv Catch","All-rounder",5,81],["Samarth Leggie","Spinner",4,78],["Laksh Deep","Fast Bowler",3,76]
+].map((p,i)=>({id:i,name:p[0],role:p[1],base:p[2],rating:p[3]}));
+let myTeam=localStorage.getItem("iplTeam")||"", squads=JSON.parse(localStorage.getItem("iplSquads")||"{}"),purses=JSON.parse(localStorage.getItem("iplPurses")||"{}"),idx=0,currentBid=0,shot="NORMAL";
+let game={runs:0,wickets:0,balls:0,overs:5,active:false,flight:0,delivery:false,target:null,innings:1};
+function save(){localStorage.setItem("iplTeam",myTeam);localStorage.setItem("iplSquads",JSON.stringify(squads));localStorage.setItem("iplPurses",JSON.stringify(purses))}
+function teamName(t){return teams.find(x=>x.short===t)?.name||t}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");if(id==="auction")renderAuction();if(id==="squad")renderSquad();if(id==="matchSetup")fillSetup()}
+function initTeams(){document.getElementById("teams").innerHTML=teams.map(t=>`<div class="team ${myTeam===t.short?'selected':''}" onclick="selectTeam('${t.short}')"><b style="color:${t.color}">${t.short}</b><span>${t.name} franchise</span></div>`).join("")}
+function selectTeam(t){myTeam=t;if(!squads[t])squads[t]=[];if(purses[t]===undefined)purses[t]=100;save();initTeams();show("auction")}
+function renderAuction(){document.getElementById("auctionTeam").textContent="टीम: "+(myTeam||"चुनें");document.getElementById("purse").textContent="बजट: ₹"+(purses[myTeam]??100).toFixed(1)+" Cr";document.getElementById("bought").textContent="खिलाड़ी: "+(squads[myTeam]?.length||0);let p=players[idx%players.length];currentBid=p.base;document.getElementById("auctionPlayer").innerHTML=`<div class="center" style="font-size:44px">🏏</div><h3>${p.name}</h3><p>${p.role} • Rating ${p.rating}/100</p><div class="price">Base Price ₹${p.base} Cr</div>`}
+function bid(){if(!myTeam){document.getElementById("auctionMsg").textContent="पहले Home से अपनी टीम चुनो।";return}let p=players[idx%players.length],owned=squads[myTeam]||[];if(owned.some(x=>x.id===p.id)){document.getElementById("auctionMsg").textContent="यह खिलाड़ी तुम्हारी टीम में पहले से है।";return}let cost=currentBid;if(purses[myTeam]<cost){document.getElementById("auctionMsg").textContent="बजट कम है!";return}squads[myTeam].push({...p,paid:cost});purses[myTeam]-=cost;save();document.getElementById("auctionMsg").textContent="SOLD! "+p.name+" तुम्हारी टीम में आ गया।";renderAuction()}
+function nextPlayer(){idx=(idx+1)%players.length;renderAuction();document.getElementById("auctionMsg").textContent="अगला खिलाड़ी नीलामी में है।"}
+function skipPlayer(){nextPlayer();document.getElementById("auctionMsg").textContent="खिलाड़ी PASS किया।"}
+function renderSquad(){let list=squads[myTeam]||[];document.getElementById("squadInfo").innerHTML=`<p>${myTeam||"कोई टीम नहीं"} • ${list.length} खिलाड़ी • बचा बजट ₹${(purses[myTeam]??100).toFixed(1)} Cr</p>`;document.getElementById("squadList").innerHTML=list.length?list.map(p=>`<div class="player"><div><b>${p.name}</b><small>${p.role} • Rating ${p.rating}</small></div><span class="price">₹${p.paid} Cr</span></div>`).join(""):"अभी खिलाड़ी नहीं हैं। Auction में जाकर खिलाड़ी खरीदो।"}
+function fillSetup(){let opts=teams.map(t=>`<option value="${t.short}">${t.name} (${t.short})</option>`).join("");document.getElementById("myTeam").innerHTML=opts;document.getElementById("oppTeam").innerHTML=opts;document.getElementById("myTeam").value=myTeam||"MI";document.getElementById("oppTeam").value=teams.find(t=>t.short!==(myTeam||"MI")).short}
+function startMatch(){let a=document.getElementById("myTeam").value,b=document.getElementById("oppTeam").value;if(a===b){alert("दो अलग टीम चुनो");return}game={runs:0,wickets:0,balls:0,overs:+document.getElementById("overs").value,active:true,flight:0,delivery:false,target:null,innings:1,team:a,opp:b};document.getElementById("batTeam").textContent=teamName(a)+" batting";document.getElementById("targetText").textContent="Target: —";show("match");updateScore();newBall();drawGround()}
+function updateScore(){document.getElementById("score").textContent=game.runs+"/"+game.wickets;document.getElementById("overText").textContent=Math.floor(game.balls/6)+"."+(game.balls%6)+" overs"}
+function chooseShot(s){shot=s;document.getElementById("timing").textContent=s+" shot selected. गेंद आने पर HIT दबाओ!"}
+function newBall(){if(!game.active)return;game.delivery=true;game.flight=0;document.getElementById("commentary").textContent="Bowler दौड़कर आ रहा है…";document.getElementById("hitBtn").disabled=false;animateBall()}
+function animateBall(){if(!game.delivery)return;game.flight+=0.018;drawGround();if(game.flight>=1){game.delivery=false;resolveShot(false);return}requestAnimationFrame(animateBall)}
+function hit(){if(!game.active||!game.delivery)return;let f=game.flight;game.delivery=false;resolveShot(true,f)}
+function resolveShot(tapped,f=game.flight){let timing=Math.abs(f-.78);let outcome;if(!tapped){outcome=Math.random()<.45?"W":0}else if(shot==="DEFENCE"){outcome=timing<.2?(Math.random()<.12?"W":1):(Math.random()<.2?"W":0)}else if(timing<.075){outcome=shot==="LOFT"?(Math.random()<.68?6:4):(Math.random()<.55?4:6)}else if(timing<.17){outcome=[1,2,3,4][Math.floor(Math.random()*4)]}else{outcome=Math.random()<.28?"W":[0,1,2][Math.floor(Math.random()*3)]}
+game.balls++;if(outcome==="W")game.wickets++;else game.runs+=outcome;document.getElementById("commentary").textContent=outcome==="W"?"OUT! विकेट गिरा!":outcome===6?" शानदार SIX! 🚀":outcome===4?"FOUR! शानदार शॉट!":outcome===0?"डॉट बॉल":outcome+" रन";document.getElementById("timing").textContent=tapped?(timing<.075?"PERFECT TIMING!":"Timing: "+(timing<.17?"GOOD":"LATE / EARLY")):"गेंद निकल गई — अगली बार सही टाइम पर HIT दबाओ।";updateScore();drawGround();if(game.wickets>=10||game.balls>=game.overs*6){game.active=false;setTimeout(endMatch,900)}else{setTimeout(newBall,1000)}}
+function endMatch(){document.getElementById("resultScore").textContent=game.runs+"/"+game.wickets+" ("+game.overs+" overs)";document.getElementById("resultText").textContent=teamName(game.team)+" ने innings पूरी की। यह prototype अभी एक innings batting challenge है; full two-innings IPL tournament आगे जोड़ा जा सकता है।";show("result")}
+function drawGround(){let c=document.getElementById("ground");if(!c)return;let x=c.getContext("2d"),w=c.width,h=c.height;x.clearRect(0,0,w,h);let sky=x.createLinearGradient(0,0,0,h);sky.addColorStop(0,"#102d4c");sky.addColorStop(.45,"#28445b");sky.addColorStop(.46,"#12633e");sky.addColorStop(1,"#07351f");x.fillStyle=sky;x.fillRect(0,0,w,h);
+x.fillStyle="#1c3345";x.beginPath();x.ellipse(w/2,h*.28,w*.48,h*.23,0,0,Math.PI*2);x.fill();for(let i=0;i<90;i++){let a=i/90*Math.PI*2;x.fillStyle=i%2?"#ffd166":"#f4f7fa";x.beginPath();x.arc(w/2+Math.cos(a)*w*.45,h*.28+Math.sin(a)*h*.19,3,0,7);x.fill()}
+x.fillStyle="#27854a";x.beginPath();x.ellipse(w/2,h*.72,w*.42,h*.32,0,0,Math.PI*2);x.fill();x.fillStyle="#c4a16a";x.fillRect(w*.46,h*.48,w*.08,h*.36);x.strokeStyle="#fff";x.lineWidth=3;x.strokeRect(w*.46,h*.48,w*.08,h*.36);
+function person(px,py,scale,shirt){x.fillStyle=shirt;x.beginPath();x.arc(px,py-30*scale,10*scale,0,7);x.fill();x.fillRect(px-8*scale,py-22*scale,16*scale,25*scale);x.strokeStyle="#101820";x.lineWidth=4*scale;x.beginPath();x.moveTo(px-4*scale,py+3*scale);x.lineTo(px-8*scale,py+20*scale);x.moveTo(px+4*scale,py+3*scale);x.lineTo(px+8*scale,py+20*scale);x.stroke()}
+person(w*.5,h*.53,1.1,"#e9edf2");person(w*.5,h*.88,1.35,"#ffb703");x.fillStyle="#fff";x.fillRect(w*.485,h*.46,4,14);x.fillRect(w*.515,h*.46,4,14);
+if(game.delivery){let bx=w*(.5-.27*game.flight),by=h*(.55+.12*game.flight);x.fillStyle="#d92929";x.beginPath();x.arc(bx,by,9,0,7);x.fill();x.strokeStyle="#fff";x.beginPath();x.arc(bx,by,5,0,Math.PI);x.stroke()}else{x.fillStyle="#fff";x.font="bold 20px Arial";x.fillText("🏏",w*.52,h*.84)}}
+initTeams();fillSetup();renderAuction();renderSquad();
+</script>
+</body>
+</html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
